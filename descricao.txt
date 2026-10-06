@@ -1,0 +1,17 @@
+sistema de consulta de postos de combustivel que unifica varias caracteristicas de postos que sao frequentmente procuradas pelas pessoas.
+
+features a serem implementadas:
+- marca do posto (se é bandeira branca ou nao)
+- fiscalizaçoes de qualidade dos postos (https://anpcomvcpostos.anp.gov.br/)
+- se um psoto tem ou nao estacao de carregamento de carro eletrico (se tem, quantas estacoes tem, qual o valor do kWh, etc)
+- combustiveis disponiveis (etanol, gasolina comum, gasolina aditivada, diesel...)
+- preço de cada combustivel
+- se tem conveniencia no posto
+
+a ideia é implementar um modelo de consulta hivrido para o usuario, permitindo que ele busque a lista de postos disponiveis em uma certa cidade ou busque pelo mapa.
+
+se um posto nao possuir todas as informações disponiveis na internet, ele ainda deve aparecer no sistema. nesse caso, indique apenas os dados dele que estiverem disponiveis na internet, deixando os outros (como em branco ou coisa do tipo)
+
+faça consultas em bases de dados na internet para levantar esses recursos.
+
+o sistema deve ser uma aplicação web, desenvolvido em SvelteKit • TypeScript • CSS Moderno.

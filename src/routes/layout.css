@@ -1,0 +1,74 @@
+@import 'tailwindcss';
+@import 'leaflet/dist/leaflet.css';
+
+/* Estilos refinados para mapas Leaflet */
+.leaflet-popup-content-wrapper {
+	padding: 0;
+	border-radius: 1rem;
+	overflow: hidden;
+	box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+	border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .leaflet-popup-content-wrapper {
+	background-color: #18181b;
+	color: #f4f4f5;
+	border-color: #27272a;
+}
+
+.leaflet-popup-content {
+	margin: 0 !important;
+	line-height: 1.5;
+}
+
+.leaflet-popup-tip {
+	background: white;
+}
+
+.dark .leaflet-popup-tip {
+	background: #18181b;
+}
+
+/* Animação suave de pulso para ponto do usuário */
+@keyframes user-pulse {
+	0% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+	}
+	70% {
+		transform: scale(1);
+		box-shadow: 0 0 0 14px rgba(59, 130, 246, 0);
+	}
+	100% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+	}
+}
+
+.user-location-marker {
+	width: 18px;
+	height: 18px;
+	background-color: #2563eb;
+	border: 3px solid #ffffff;
+	border-radius: 50%;
+	animation: user-pulse 2s infinite;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #cbd5e1;
+	border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #94a3b8;
+}

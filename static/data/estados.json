@@ -1,0 +1,353 @@
+[
+  {
+    "sigla": "AC",
+    "nome": "Acre",
+    "regiao": "Norte",
+    "capital": "Rio Branco",
+    "centro": {
+      "lat": -9.9749,
+      "lng": -67.8243
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 187,
+    "totalCidades": 22
+  },
+  {
+    "sigla": "AL",
+    "nome": "Alagoas",
+    "regiao": "Nordeste",
+    "capital": "Maceió",
+    "centro": {
+      "lat": -9.6498,
+      "lng": -35.7089
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 544,
+    "totalCidades": 98
+  },
+  {
+    "sigla": "AP",
+    "nome": "Amapá",
+    "regiao": "Norte",
+    "capital": "Macapá",
+    "centro": {
+      "lat": 0.0356,
+      "lng": -51.0705
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 139,
+    "totalCidades": 16
+  },
+  {
+    "sigla": "AM",
+    "nome": "Amazonas",
+    "regiao": "Norte",
+    "capital": "Manaus",
+    "centro": {
+      "lat": -3.119,
+      "lng": -60.0217
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 835,
+    "totalCidades": 62
+  },
+  {
+    "sigla": "BA",
+    "nome": "Bahia",
+    "regiao": "Nordeste",
+    "capital": "Salvador",
+    "centro": {
+      "lat": -12.9714,
+      "lng": -38.5014
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 3497,
+    "totalCidades": 416
+  },
+  {
+    "sigla": "CE",
+    "nome": "Ceará",
+    "regiao": "Nordeste",
+    "capital": "Fortaleza",
+    "centro": {
+      "lat": -3.7172,
+      "lng": -38.5433
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 1973,
+    "totalCidades": 183
+  },
+  {
+    "sigla": "DF",
+    "nome": "Distrito Federal",
+    "regiao": "Centro-Oeste",
+    "capital": "Brasília",
+    "centro": {
+      "lat": -15.7975,
+      "lng": -47.8919
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 367,
+    "totalCidades": 1
+  },
+  {
+    "sigla": "ES",
+    "nome": "Espírito Santo",
+    "regiao": "Sudeste",
+    "capital": "Vitória",
+    "centro": {
+      "lat": -20.3155,
+      "lng": -40.3128
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 767,
+    "totalCidades": 78
+  },
+  {
+    "sigla": "GO",
+    "nome": "Goiás",
+    "regiao": "Centro-Oeste",
+    "capital": "Goiânia",
+    "centro": {
+      "lat": -16.6869,
+      "lng": -49.2648
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 1919,
+    "totalCidades": 244
+  },
+  {
+    "sigla": "MA",
+    "nome": "Maranhão",
+    "regiao": "Nordeste",
+    "capital": "São Luís",
+    "centro": {
+      "lat": -2.5307,
+      "lng": -44.3068
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 1704,
+    "totalCidades": 216
+  },
+  {
+    "sigla": "MT",
+    "nome": "Mato Grosso",
+    "regiao": "Centro-Oeste",
+    "capital": "Cuiabá",
+    "centro": {
+      "lat": -15.6014,
+      "lng": -56.0979
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 1115,
+    "totalCidades": 142
+  },
+  {
+    "sigla": "MS",
+    "nome": "Mato Grosso do Sul",
+    "regiao": "Centro-Oeste",
+    "capital": "Campo Grande",
+    "centro": {
+      "lat": -20.4697,
+      "lng": -54.6201
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 608,
+    "totalCidades": 79
+  },
+  {
+    "sigla": "MG",
+    "nome": "Minas Gerais",
+    "regiao": "Sudeste",
+    "capital": "Belo Horizonte",
+    "centro": {
+      "lat": -19.9167,
+      "lng": -43.9345
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 4890,
+    "totalCidades": 836
+  },
+  {
+    "sigla": "PR",
+    "nome": "Paraná",
+    "regiao": "Sul",
+    "capital": "Curitiba",
+    "centro": {
+      "lat": -25.4284,
+      "lng": -49.2733
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 2813,
+    "totalCidades": 396
+  },
+  {
+    "sigla": "PB",
+    "nome": "Paraíba",
+    "regiao": "Nordeste",
+    "capital": "João Pessoa",
+    "centro": {
+      "lat": -7.1195,
+      "lng": -34.845
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 842,
+    "totalCidades": 217
+  },
+  {
+    "sigla": "PA",
+    "nome": "Pará",
+    "regiao": "Norte",
+    "capital": "Belém",
+    "centro": {
+      "lat": -1.4558,
+      "lng": -48.4902
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 1633,
+    "totalCidades": 142
+  },
+  {
+    "sigla": "PE",
+    "nome": "Pernambuco",
+    "regiao": "Nordeste",
+    "capital": "Recife",
+    "centro": {
+      "lat": -8.0476,
+      "lng": -34.877
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 1542,
+    "totalCidades": 182
+  },
+  {
+    "sigla": "PI",
+    "nome": "Piauí",
+    "regiao": "Nordeste",
+    "capital": "Teresina",
+    "centro": {
+      "lat": -5.092,
+      "lng": -42.8038
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 1193,
+    "totalCidades": 220
+  },
+  {
+    "sigla": "RN",
+    "nome": "Rio Grande do Norte",
+    "regiao": "Nordeste",
+    "capital": "Natal",
+    "centro": {
+      "lat": -5.7945,
+      "lng": -35.211
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 730,
+    "totalCidades": 160
+  },
+  {
+    "sigla": "RS",
+    "nome": "Rio Grande do Sul",
+    "regiao": "Sul",
+    "capital": "Porto Alegre",
+    "centro": {
+      "lat": -30.0346,
+      "lng": -51.2177
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 3051,
+    "totalCidades": 493
+  },
+  {
+    "sigla": "RJ",
+    "nome": "Rio de Janeiro",
+    "regiao": "Sudeste",
+    "capital": "Rio de Janeiro",
+    "centro": {
+      "lat": -22.9068,
+      "lng": -43.1729
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 1923,
+    "totalCidades": 92
+  },
+  {
+    "sigla": "RO",
+    "nome": "Rondônia",
+    "regiao": "Norte",
+    "capital": "Porto Velho",
+    "centro": {
+      "lat": -8.7619,
+      "lng": -63.9039
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 501,
+    "totalCidades": 51
+  },
+  {
+    "sigla": "RR",
+    "nome": "Roraima",
+    "regiao": "Norte",
+    "capital": "Boa Vista",
+    "centro": {
+      "lat": 2.8235,
+      "lng": -60.6758
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 142,
+    "totalCidades": 15
+  },
+  {
+    "sigla": "SC",
+    "nome": "Santa Catarina",
+    "regiao": "Sul",
+    "capital": "Florianópolis",
+    "centro": {
+      "lat": -27.5954,
+      "lng": -48.548
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 2037,
+    "totalCidades": 294
+  },
+  {
+    "sigla": "SE",
+    "nome": "Sergipe",
+    "regiao": "Nordeste",
+    "capital": "Aracaju",
+    "centro": {
+      "lat": -10.9472,
+      "lng": -37.0731
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 318,
+    "totalCidades": 67
+  },
+  {
+    "sigla": "SP",
+    "nome": "São Paulo",
+    "regiao": "Sudeste",
+    "capital": "São Paulo",
+    "centro": {
+      "lat": -23.5505,
+      "lng": -46.6333
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 8273,
+    "totalCidades": 641
+  },
+  {
+    "sigla": "TO",
+    "nome": "Tocantins",
+    "regiao": "Norte",
+    "capital": "Palmas",
+    "centro": {
+      "lat": -10.2128,
+      "lng": -48.3603
+    },
+    "zoom": 12,
+    "totalPostosCadastrados": 391,
+    "totalCidades": 120
+  }
+]
