@@ -186,6 +186,27 @@
 					</span>
 				</div>
 			{/if}
+
+			{#if posto.precos.fonte}
+				<div class="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center justify-between text-[10px]">
+					{#if posto.precos.fonte.includes('Coleta em Bomba')}
+						<span class="inline-flex items-center gap-1 font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+							<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+							{posto.precos.fonte}
+						</span>
+					{:else if posto.precos.fonte.includes('Municipal')}
+						<span class="inline-flex items-center gap-1 font-medium text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+							<span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+							{posto.precos.fonte}
+						</span>
+					{:else}
+						<span class="inline-flex items-center gap-1 font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+							<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+							{posto.precos.fonte}
+						</span>
+					{/if}
+				</div>
+			{/if}
 		{:else}
 			<div class="py-2 px-3 bg-amber-50/60 border border-amber-200/60 rounded-lg text-center">
 				<p class="text-xs text-amber-800 font-medium">Preços não informados na base online recente.</p>

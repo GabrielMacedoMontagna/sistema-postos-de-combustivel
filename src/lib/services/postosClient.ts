@@ -11,6 +11,11 @@ export interface EstadoInfo {
 	zoom: number;
 	totalPostosCadastrados: number;
 	totalCidades?: number;
+	precosMedios?: {
+		gasolina?: number;
+		etanol?: number;
+		diesel?: number;
+	};
 }
 
 export interface CidadeInfo {

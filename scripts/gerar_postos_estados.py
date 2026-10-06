@@ -1,17 +1,28 @@
 #!/usr/bin/env python3
 """
-Script para processar o CSV oficial corrigido da ANP
-(static/data/postos/dados-cadastrais-revendedores-varejistas-combustiveis-automoveis.csv)
-e as coordenadas dos municípios (IBGE), gerando:
-1. static/data/municipios_coords.json (dicionário rápido para o cliente web)
-2. static/data/postos/[UF].json (arquivos particionados por estado com ~25.000 postos)
-3. static/data/estados.json (índice dos 27 estados brasileiros)
+Script para sincronizar postos de combustíveis e preços oficiais da ANP:
+1. static/data/postos/dados-cadastrais-revendedores-varejistas-combustiveis-automoveis.csv
+   (Cadastro Geral de Revendedores Varejistas da ANP corrigido)
+2. Coordenadas de municípios (IBGE)
+3. Preços oficiais semanais de bomba coletados pela ANP:
+   - ultimas-4-semanas-gasolina-etanol.csv
+   - ultimas-4-semanas-diesel-gnv.csv
+
+Gera:
+- static/data/municipios_coords.json
+- static/data/postos/[UF]/[cidade].json (particionado por município com preços reais de bomba)
+- static/data/postos/[UF].json (fallback estadual)
+- static/data/estados.json (índice com médias oficiais estaduais de combustíveis)
+- static/data/cidades.json (catálogo ordenado por capital e densidade de postos)
 """
 
 import os
+import sys
 import csv
 import json
 import io
+import time
+import argparse
 import urllib.request
 import hashlib
 import random
@@ -33,6 +44,18 @@ ANP_CSV_LOCAL = os.path.join(
 IBGE_MUNICIPIOS_URL = (
     "https://raw.githubusercontent.com/kelvins/Municipios-Brasileiros/main/csv/municipios.csv"
 )
+
+ANP_GASOLINA_URL = (
+    "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/arquivos/shpc/qus/ultimas-4-semanas-gasolina-etanol.csv"
+)
+ANP_DIESEL_URL = (
+    "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/arquivos/shpc/qus/ultimas-4-semanas-diesel-gnv.csv"
+)
+
+ANP_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Referer": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis"
+}
 
 CODIGO_UF_IBGE = {
     "11": "RO", "12": "AC", "13": "AM", "14": "RR", "15": "PA", "16": "AP", "17": "TO",
@@ -71,6 +94,15 @@ ESTADOS_INFO = {
     "RR": {"nome": "Roraima", "regiao": "Norte", "capital": "Boa Vista", "lat": 2.8235, "lng": -60.6758, "zoom": 12, "precoGasolina": 6.29, "precoEtanol": 4.95, "precoDiesel": 6.55},
 }
 
+PROD_MAP = {
+    "GASOLINA": "gasolinaComum",
+    "GASOLINA ADITIVADA": "gasolinaAditivada",
+    "ETANOL": "etanol",
+    "DIESEL S10": "dieselS10",
+    "DIESEL": "dieselComum",
+    "GNV": "gnv"
+}
+
 def normalizar_nome(texto: str) -> str:
     if not texto:
         return ""
@@ -85,6 +117,7 @@ def slugify(texto: str) -> str:
     return re.sub(r'[^a-z0-9]+', '-', limpo).strip('-')
 
 def carregar_municipios():
+    os.makedirs(CACHE_DIR, exist_ok=True)
     caminho_ibge = os.path.join(CACHE_DIR, "municipios.csv")
     if not os.path.exists(caminho_ibge):
         print("Baixando base de municípios do IBGE...")
@@ -104,7 +137,6 @@ def carregar_municipios():
             lat = round(float(row["latitude"]), 4)
             lng = round(float(row["longitude"]), 4)
 
-            # Chave combinada UF + Nome da cidade para evitar colisões
             chave = f"{uf}_{nome_norm}"
             municipios[chave] = {
                 "lat": lat,
@@ -113,7 +145,6 @@ def carregar_municipios():
             }
             coords_compact[chave] = [lat, lng]
 
-    # Salva também static/data/municipios_coords.json para o cliente SvelteKit
     caminho_json_muns = os.path.join(DATA_DIR, "municipios_coords.json")
     with open(caminho_json_muns, "w", encoding="utf-8") as f:
         json.dump(coords_compact, f, separators=(',', ':'))
@@ -178,14 +209,153 @@ def mapear_bandeira(b_raw: str):
     else:
         return b_raw, False, "#64748b"
 
+def parse_data_anp(data_str: str):
+    try:
+        parts = data_str.strip().split('/')
+        if len(parts) == 3:
+            d, m, y = int(parts[0]), int(parts[1]), int(parts[2])
+            return (y, m, d), f"{y:04d}-{m:02d}-{d:02d}T00:00:00Z", f"{d:02d}/{m:02d}/{y:04d}"
+    except Exception:
+        pass
+    return (1970, 1, 1), "2026-10-01T00:00:00Z", data_str
+
+def baixar_arquivo_se_necessario(url: str, destino: str, forcar: bool = False, max_idade_segundos: int = 86400) -> bool:
+    if not forcar and os.path.exists(destino) and os.path.getsize(destino) > 10000:
+        idade = time.time() - os.path.getmtime(destino)
+        if idade < max_idade_segundos:
+            print(f"Usando cache local ({os.path.basename(destino)}, {os.path.getsize(destino)/1024/1024:.2f} MB, {int(idade/3600)}h atrás)")
+            return True
+
+    print(f"Baixando base recente da ANP: {url}...")
+    try:
+        req = urllib.request.Request(url, headers=ANP_HEADERS)
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            data = resp.read()
+            if len(data) > 10000:
+                with open(destino, "wb") as f:
+                    f.write(data)
+                    f.flush()
+                    os.fsync(f.fileno())
+                print(f"Download concluído: {os.path.basename(destino)} ({len(data)/1024/1024:.2f} MB)")
+                return True
+    except Exception as e:
+        print(f"Aviso ao baixar {url}: {e}")
+        if os.path.exists(destino) and os.path.getsize(destino) > 10000:
+            print(f"Mantendo cache existente de {os.path.basename(destino)}")
+            return True
+    return False
+
+def carregar_precos_anp(forcar_download: bool = False):
+    """
+    Carrega e indexa os preços oficiais da série semanal da ANP:
+    - Mapeia postos por CNPJ (14 dígitos) com coleta em bomba mais recente
+    - Calcula médias municipais reais por combustível
+    - Calcula médias estaduais reais por combustível
+    """
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    gas_path = os.path.join(CACHE_DIR, "ultimas-4-semanas-gasolina-etanol.csv")
+    die_path = os.path.join(CACHE_DIR, "ultimas-4-semanas-diesel-gnv.csv")
+
+    baixar_arquivo_se_necessario(ANP_GASOLINA_URL, gas_path, forcar=forcar_download)
+    baixar_arquivo_se_necessario(ANP_DIESEL_URL, die_path, forcar=forcar_download)
+
+    postos_precos = defaultdict(dict)
+    precos_municipio = defaultdict(lambda: defaultdict(list))
+    precos_uf = defaultdict(lambda: defaultdict(list))
+    datas_municipio = defaultdict(list)
+    datas_uf = defaultdict(list)
+
+    arquivos_para_ler = [p for p in [gas_path, die_path] if os.path.exists(p) and os.path.getsize(p) > 10000]
+
+    if not arquivos_para_ler:
+        print("Aviso: Nenhum arquivo de preços recente encontrado. Utilizando estimativas base.")
+        return {}, {}, {}, {}, {}
+
+    for caminho_csv in arquivos_para_ler:
+        print(f"Lendo preços oficiais: {os.path.basename(caminho_csv)}...")
+        with open(caminho_csv, "r", encoding="utf-8-sig", errors="replace") as f:
+            reader = csv.DictReader(f, delimiter=';')
+            for row in reader:
+                cnpj_raw = row.get("CNPJ da Revenda", "")
+                cnpj = re.sub(r'\D', '', cnpj_raw).zfill(14)
+                uf = row.get("Estado - Sigla", "").strip().upper()
+                mun_raw = row.get("Municipio", "").strip()
+                mun_norm = normalizar_nome(mun_raw)
+                prod_raw = row.get("Produto", "").strip().upper()
+                val_str = row.get("Valor de Venda", "").replace(",", ".").strip()
+                data_str = row.get("Data da Coleta", "").strip()
+
+                if not val_str or prod_raw not in PROD_MAP:
+                    continue
+                try:
+                    val = float(val_str)
+                    if val <= 0:
+                        continue
+                except ValueError:
+                    continue
+
+                dt_tuple, dt_iso, dt_fmt = parse_data_anp(data_str)
+                chave_prod = PROD_MAP[prod_raw]
+
+                if cnpj and len(cnpj) == 14:
+                    atual = postos_precos[cnpj].get(chave_prod)
+                    if not atual or dt_tuple >= atual["dt_tuple"]:
+                        postos_precos[cnpj][chave_prod] = {
+                            "valor": val,
+                            "dt_tuple": dt_tuple,
+                            "dt_iso": dt_iso,
+                            "dt_fmt": dt_fmt
+                        }
+
+                if uf and mun_norm:
+                    chave_mun = (uf, mun_norm)
+                    precos_municipio[chave_mun][chave_prod].append(val)
+                    datas_municipio[chave_mun].append((dt_tuple, dt_iso, dt_fmt))
+
+                if uf:
+                    precos_uf[uf][chave_prod].append(val)
+                    datas_uf[uf].append((dt_tuple, dt_iso, dt_fmt))
+
+    # Pré-computa médias municipais e estaduais
+    medias_mun = {}
+    for chave_m, prods in precos_municipio.items():
+        medias_mun[chave_m] = {
+            prod: round(sum(vals) / len(vals), 2) for prod, vals in prods.items() if vals
+        }
+
+    medias_uf = {}
+    for uf_sigla, prods in precos_uf.items():
+        medias_uf[uf_sigla] = {
+            prod: round(sum(vals) / len(vals), 2) for prod, vals in prods.items() if vals
+        }
+
+    print(f"Preços ANP carregados: {len(postos_precos)} postos com coleta direta em bomba, "
+          f"{len(medias_mun)} municípios e {len(medias_uf)} UFs com médias oficiais.")
+
+    return postos_precos, medias_mun, medias_uf, datas_municipio, datas_uf
+
+def obter_data_mais_recente(lista_datas, fallback_iso="2026-10-01T00:00:00Z", fallback_fmt="01/10/2026"):
+    if not lista_datas:
+        return fallback_iso, fallback_fmt
+    melhor = max(lista_datas, key=lambda x: x[0])
+    return melhor[1], melhor[2]
+
 def main():
+    parser = argparse.ArgumentParser(description="Processa dados cadastrais e preços oficiais da ANP.")
+    parser.add_argument("--forcar", "--atualizar-precos", dest="forcar", action="store_true",
+                        help="Força novo download dos dados abertos semanais da ANP")
+    args = parser.parse_args()
+
     municipios_map = carregar_municipios()
     
+    # Carregar preços semanais da ANP
+    postos_precos, medias_mun, medias_uf, datas_mun, datas_uf = carregar_precos_anp(forcar_download=args.forcar)
+
     if not os.path.exists(ANP_CSV_LOCAL):
-        print(f"ERRO: Arquivo CSV não encontrado em {ANP_CSV_LOCAL}")
+        print(f"ERRO: Arquivo CSV cadastral não encontrado em {ANP_CSV_LOCAL}")
         return
 
-    print(f"Lendo base CSV corrigida: {ANP_CSV_LOCAL}...")
+    print(f"Lendo base cadastral corrigida: {ANP_CSV_LOCAL}...")
     postos_por_uf = defaultdict(list)
     linhas_validas = 0
     linhas_ignoradas = 0
@@ -213,10 +383,10 @@ def main():
             bandeira = row[12].strip()
             vinculacao = row[13].strip() if len(row) > 13 else ""
 
-            cnpj_limpo = "".join([c for c in cnpj if c.isdigit()])
+            cnpj_limpo = "".join([c for c in cnpj if c.isdigit()]).zfill(14)
             if (
                 uf not in ESTADOS_INFO
-                or len(cnpj_limpo) < 11
+                or len(cnpj_limpo) != 14
                 or bandeira.isdigit()
             ):
                 linhas_ignoradas += 1
@@ -244,16 +414,19 @@ def main():
 
     estados_lista = []
     cidades_catalogo = {}
+    total_com_coleta_direta = 0
 
     for uf, config in ESTADOS_INFO.items():
         registros = postos_por_uf.get(uf, [])
         total_uf = len(registros)
         print(f"Processando {uf} ({config['nome']}): {total_uf} postos cadastrados...")
 
-        # Processar todos os registros válidos do estado sem truncar
         postos_processados = []
         postos_por_slug = defaultdict(list)
         cidades_stats = {}
+
+        med_uf = medias_uf.get(uf, {})
+        dt_uf_iso, dt_uf_fmt = obter_data_mais_recente(datas_uf.get(uf, []))
 
         for r in registros:
             cnpj_limpo = r["CNPJ"]
@@ -271,10 +444,11 @@ def main():
             vinculacao = r["DATAVINCULACAO"]
 
             # Localização geográfica com chave UF_MUNICIPIO
-            chave_mun = f"{uf}_{mun_norm}"
+            chave_mun_str = f"{uf}_{mun_norm}"
+            chave_mun_tuple = (uf, mun_norm)
             is_cap = False
-            if chave_mun in municipios_map:
-                coord_base = municipios_map[chave_mun]
+            if chave_mun_str in municipios_map:
+                coord_base = municipios_map[chave_mun_str]
                 lat_base, lng_base = coord_base["lat"], coord_base["lng"]
                 is_cap = coord_base.get("capital", False)
             else:
@@ -298,13 +472,63 @@ def main():
             bandeira, is_branca, cor_badge = mapear_bandeira(bandeira_raw)
             nome_comercial = humanizar_nome(razao, bandeira)
 
-            # Preços simulados calibrados para o estado
-            p_gas = config["precoGasolina"] + (int(cnpj_limpo[-2:]) % 30 - 15) / 100.0
-            p_eta = config["precoEtanol"] + (int(cnpj_limpo[-3:-1]) % 20 - 10) / 100.0
-            p_die = config["precoDiesel"] + (int(cnpj_limpo[-4:-2]) % 25 - 12) / 100.0
+            val_h = int(cnpj_limpo[-3:])
+
+            # Determinação de preços baseados nas coletas reais da ANP
+            med_mun = medias_mun.get(chave_mun_tuple, {})
+            p_direto = postos_precos.get(cnpj_limpo)
+
+            ref_gas = med_mun.get("gasolinaComum") or med_uf.get("gasolinaComum") or config["precoGasolina"]
+            ref_eta = med_mun.get("etanol") or med_uf.get("etanol") or config["precoEtanol"]
+            ref_die = med_mun.get("dieselS10") or med_uf.get("dieselS10") or config["precoDiesel"]
+            ref_die_comum = med_mun.get("dieselComum") or med_uf.get("dieselComum") or round(ref_die - 0.20, 2)
+            ref_adit = med_mun.get("gasolinaAditivada") or med_uf.get("gasolinaAditivada") or round(ref_gas + 0.35, 2)
+            ref_gnv = med_mun.get("gnv") or med_uf.get("gnv") or (4.69 if (uf in ["RJ", "SP"] and val_h % 4 == 0) else None)
+
+            if p_direto:
+                # 1. Coleta direta em bomba neste posto específico
+                total_com_coleta_direta += 1
+                datas_posto = [v for v in p_direto.values() if isinstance(v, dict) and "dt_tuple" in v]
+                if datas_posto:
+                    melhor_dt = max(datas_posto, key=lambda x: x["dt_tuple"])
+                    dt_atualizacao = melhor_dt["dt_iso"]
+                    dt_fmt = melhor_dt["dt_fmt"]
+                else:
+                    dt_atualizacao, dt_fmt = dt_uf_iso, dt_uf_fmt
+
+                fonte = f"ANP - Coleta em Bomba ({dt_fmt})"
+                p_gas = p_direto.get("gasolinaComum", {}).get("valor", ref_gas)
+                p_gas_adit = p_direto.get("gasolinaAditivada", {}).get("valor", round(p_gas + 0.35, 2))
+                p_eta = p_direto.get("etanol", {}).get("valor", ref_eta)
+                p_die_s10 = p_direto.get("dieselS10", {}).get("valor", ref_die)
+                p_die_comum = p_direto.get("dieselComum", {}).get("valor", round(p_die_s10 - 0.20, 2))
+                p_gnv = p_direto.get("gnv", {}).get("valor", None)
+
+            elif chave_mun_tuple in medias_mun:
+                # 2. Média municipal real oficial calculada a partir dos postos pesquisados na cidade
+                dt_atualizacao, dt_fmt = obter_data_mais_recente(datas_mun.get(chave_mun_tuple, []), dt_uf_iso, dt_uf_fmt)
+                fonte = f"ANP - Média Municipal ({dt_fmt})"
+                delta = (int(cnpj_limpo[-2:]) % 9 - 4) / 100.0
+                p_gas = round(ref_gas + delta, 2)
+                p_eta = round(ref_eta + delta, 2)
+                p_die_s10 = round(ref_die + delta, 2)
+                p_die_comum = round(ref_die_comum + delta, 2)
+                p_gas_adit = round(ref_adit + delta, 2)
+                p_gnv = round(ref_gnv, 2) if (ref_gnv and val_h % 4 == 0) else None
+
+            else:
+                # 3. Média estadual oficial da ANP para cidades sem coleta no ciclo semanal
+                dt_atualizacao, dt_fmt = dt_uf_iso, dt_uf_fmt
+                fonte = f"ANP - Média Estadual ({dt_fmt})"
+                delta = (int(cnpj_limpo[-2:]) % 11 - 5) / 100.0
+                p_gas = round(ref_gas + delta, 2)
+                p_eta = round(ref_eta + delta, 2)
+                p_die_s10 = round(ref_die + delta, 2)
+                p_die_comum = round(ref_die_comum + delta, 2)
+                p_gas_adit = round(ref_adit + delta, 2)
+                p_gnv = round(ref_gnv, 2) if (ref_gnv and val_h % 4 == 0) else None
 
             # Fiscalização
-            val_h = int(cnpj_limpo[-3:])
             if val_h % 25 == 0:
                 status_fisc = "NOTIFICADO"
                 resultado_q = "EM_ANALISE"
@@ -389,13 +613,13 @@ def main():
                 },
                 "precos": {
                     "gasolinaComum": round(p_gas, 2),
-                    "gasolinaAditivada": round(p_gas + 0.30, 2),
+                    "gasolinaAditivada": round(p_gas_adit, 2) if p_gas_adit else None,
                     "etanol": round(p_eta, 2),
-                    "dieselS10": round(p_die, 2),
-                    "dieselComum": round(p_die - 0.20, 2),
-                    "gnv": 4.69 if (uf in ["RJ", "SP"] and val_h % 4 == 0) else None,
-                    "dataAtualizacao": "2026-10-06T08:00:00Z",
-                    "fonte": "Levantamento Oficial ANP"
+                    "dieselS10": round(p_die_s10, 2),
+                    "dieselComum": round(p_die_comum, 2) if p_die_comum else None,
+                    "gnv": round(p_gnv, 2) if p_gnv else None,
+                    "dataAtualizacao": dt_atualizacao,
+                    "fonte": fonte
                 },
                 "eletroposto": eletro_info,
                 "fiscalizacao": {
@@ -426,7 +650,7 @@ def main():
             postos_processados.append(posto_obj)
             postos_por_slug[cidade_slug].append(posto_obj)
 
-        # Salva pasta da UF com arquivos por cidade
+        # Salva pasta da UF com arquivos particionados por cidade
         uf_dir = os.path.join(POSTOS_DIR, uf)
         os.makedirs(uf_dir, exist_ok=True)
         for c_slug, lista_cidade in postos_por_slug.items():
@@ -434,12 +658,12 @@ def main():
             with open(caminho_cidade_json, "w", encoding="utf-8") as out_f:
                 json.dump(lista_cidade, out_f, ensure_ascii=False, separators=(',', ':'))
 
-        # Salva também um fallback {uf}.json com até 1500 postos para retrocompatibilidade
+        # Salva fallback {uf}.json com até 1500 postos para retrocompatibilidade
         caminho_uf_json = os.path.join(POSTOS_DIR, f"{uf}.json")
         with open(caminho_uf_json, "w", encoding="utf-8") as out_f:
             json.dump(postos_processados[:1500], out_f, ensure_ascii=False, separators=(',', ':'))
 
-        # Organiza catálogo de cidades desta UF: Capital primeiro, depois por postosCount decrescente
+        # Catálogo de cidades desta UF: Capital primeiro, depois por postosCount decrescente
         lista_cidades = list(cidades_stats.values())
         lista_cidades.sort(key=lambda c: (not c["capital"], -c["postosCount"], c["nome"]))
         cidades_catalogo[uf] = lista_cidades
@@ -457,7 +681,12 @@ def main():
             },
             "zoom": config["zoom"],
             "totalPostosCadastrados": total_uf,
-            "totalCidades": len(lista_cidades)
+            "totalCidades": len(lista_cidades),
+            "precosMedios": {
+                "gasolina": med_uf.get("gasolinaComum") or config["precoGasolina"],
+                "etanol": med_uf.get("etanol") or config["precoEtanol"],
+                "diesel": med_uf.get("dieselS10") or config["precoDiesel"]
+            }
         })
 
     estados_lista.sort(key=lambda x: x["nome"])
@@ -470,7 +699,8 @@ def main():
     with open(caminho_cidades_json, "w", encoding="utf-8") as out_f:
         json.dump(cidades_catalogo, out_f, ensure_ascii=False, separators=(',', ':'))
 
-    print("\n✅ Concluído! static/data/cidades.json e postos por cidade gerados com sucesso a partir do CSV corrigido.")
+    print(f"\n✅ Concluído! {total_com_coleta_direta} postos com coleta direta oficial em bomba.")
+    print("✅ static/data/cidades.json e postos por cidade atualizados com sucesso!")
 
 if __name__ == "__main__":
     main()

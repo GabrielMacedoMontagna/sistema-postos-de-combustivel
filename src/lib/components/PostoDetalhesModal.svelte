@@ -258,7 +258,7 @@
 
 				<!-- Seção 3: Preços Detalhados e Paridade -->
 				<div>
-					<div class="flex items-center justify-between mb-3">
+					<div class="flex items-center justify-between mb-2">
 						<h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
 							<Fuel class="w-4 h-4 text-blue-600" />
 							Preços de Combustíveis Praticados
@@ -269,6 +269,16 @@
 							</span>
 						{/if}
 					</div>
+
+					{#if posto.precos.fonte}
+						<div class="mb-3 px-3 py-2 rounded-xl text-xs flex items-center justify-between {posto.precos.fonte.includes('Coleta em Bomba') ? 'bg-emerald-50 border border-emerald-200 text-emerald-900' : (posto.precos.fonte.includes('Municipal') ? 'bg-blue-50 border border-blue-200 text-blue-900' : 'bg-slate-50 border border-slate-200 text-slate-700')}">
+							<div class="flex items-center gap-2">
+								<span class="w-2 h-2 rounded-full {posto.precos.fonte.includes('Coleta em Bomba') ? 'bg-emerald-500' : (posto.precos.fonte.includes('Municipal') ? 'bg-blue-500' : 'bg-slate-400')}"></span>
+								<span><strong>Origem dos preços:</strong> {posto.precos.fonte}</span>
+							</div>
+							<span class="text-[11px] opacity-75 font-medium">Série Histórica ANP</span>
+						</div>
+					{/if}
 
 					{#if posto.completudeDados.precos}
 						<div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-3.5">

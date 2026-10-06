@@ -10,7 +10,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 187,
-    "totalCidades": 22
+    "totalCidades": 22,
+    "precosMedios": {
+      "gasolina": 7.34,
+      "etanol": 4.95,
+      "diesel": 8.11
+    }
   },
   {
     "sigla": "AL",
@@ -23,7 +28,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 544,
-    "totalCidades": 98
+    "totalCidades": 98,
+    "precosMedios": {
+      "gasolina": 6.84,
+      "etanol": 5.04,
+      "diesel": 7.37
+    }
   },
   {
     "sigla": "AP",
@@ -36,7 +46,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 139,
-    "totalCidades": 16
+    "totalCidades": 16,
+    "precosMedios": {
+      "gasolina": 6.56,
+      "etanol": 5.83,
+      "diesel": 7.3
+    }
   },
   {
     "sigla": "AM",
@@ -49,7 +64,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 835,
-    "totalCidades": 62
+    "totalCidades": 62,
+    "precosMedios": {
+      "gasolina": 7.4,
+      "etanol": 5.13,
+      "diesel": 7.5
+    }
   },
   {
     "sigla": "BA",
@@ -62,7 +82,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 3497,
-    "totalCidades": 416
+    "totalCidades": 416,
+    "precosMedios": {
+      "gasolina": 6.79,
+      "etanol": 4.62,
+      "diesel": 7.87
+    }
   },
   {
     "sigla": "CE",
@@ -75,7 +100,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 1973,
-    "totalCidades": 183
+    "totalCidades": 183,
+    "precosMedios": {
+      "gasolina": 7.0,
+      "etanol": 5.19,
+      "diesel": 7.29
+    }
   },
   {
     "sigla": "DF",
@@ -87,8 +117,13 @@
       "lng": -47.8919
     },
     "zoom": 12,
-    "totalPostosCadastrados": 367,
-    "totalCidades": 1
+    "totalPostosCadastrados": 369,
+    "totalCidades": 1,
+    "precosMedios": {
+      "gasolina": 6.68,
+      "etanol": 4.42,
+      "diesel": 7.19
+    }
   },
   {
     "sigla": "ES",
@@ -101,7 +136,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 767,
-    "totalCidades": 78
+    "totalCidades": 78,
+    "precosMedios": {
+      "gasolina": 6.5,
+      "etanol": 4.67,
+      "diesel": 6.85
+    }
   },
   {
     "sigla": "GO",
@@ -114,7 +154,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 1919,
-    "totalCidades": 244
+    "totalCidades": 244,
+    "precosMedios": {
+      "gasolina": 6.66,
+      "etanol": 4.28,
+      "diesel": 7.06
+    }
   },
   {
     "sigla": "MA",
@@ -127,7 +172,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 1704,
-    "totalCidades": 216
+    "totalCidades": 216,
+    "precosMedios": {
+      "gasolina": 6.74,
+      "etanol": 5.17,
+      "diesel": 7.37
+    }
   },
   {
     "sigla": "MT",
@@ -140,7 +190,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 1115,
-    "totalCidades": 142
+    "totalCidades": 142,
+    "precosMedios": {
+      "gasolina": 6.83,
+      "etanol": 4.03,
+      "diesel": 7.53
+    }
   },
   {
     "sigla": "MS",
@@ -153,7 +208,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 608,
-    "totalCidades": 79
+    "totalCidades": 79,
+    "precosMedios": {
+      "gasolina": 6.54,
+      "etanol": 4.0,
+      "diesel": 7.19
+    }
   },
   {
     "sigla": "MG",
@@ -166,7 +226,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 4890,
-    "totalCidades": 836
+    "totalCidades": 836,
+    "precosMedios": {
+      "gasolina": 6.33,
+      "etanol": 4.16,
+      "diesel": 6.98
+    }
   },
   {
     "sigla": "PR",
@@ -179,7 +244,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 2813,
-    "totalCidades": 396
+    "totalCidades": 396,
+    "precosMedios": {
+      "gasolina": 6.57,
+      "etanol": 4.15,
+      "diesel": 7.28
+    }
   },
   {
     "sigla": "PB",
@@ -192,7 +262,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 842,
-    "totalCidades": 217
+    "totalCidades": 217,
+    "precosMedios": {
+      "gasolina": 6.49,
+      "etanol": 4.72,
+      "diesel": 7.18
+    }
   },
   {
     "sigla": "PA",
@@ -205,7 +280,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 1633,
-    "totalCidades": 142
+    "totalCidades": 142,
+    "precosMedios": {
+      "gasolina": 6.8,
+      "etanol": 4.87,
+      "diesel": 7.41
+    }
   },
   {
     "sigla": "PE",
@@ -218,7 +298,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 1542,
-    "totalCidades": 182
+    "totalCidades": 182,
+    "precosMedios": {
+      "gasolina": 6.85,
+      "etanol": 4.98,
+      "diesel": 7.14
+    }
   },
   {
     "sigla": "PI",
@@ -231,7 +316,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 1193,
-    "totalCidades": 220
+    "totalCidades": 220,
+    "precosMedios": {
+      "gasolina": 6.78,
+      "etanol": 4.86,
+      "diesel": 7.55
+    }
   },
   {
     "sigla": "RN",
@@ -244,7 +334,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 730,
-    "totalCidades": 160
+    "totalCidades": 160,
+    "precosMedios": {
+      "gasolina": 6.84,
+      "etanol": 5.33,
+      "diesel": 7.47
+    }
   },
   {
     "sigla": "RS",
@@ -257,7 +352,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 3051,
-    "totalCidades": 493
+    "totalCidades": 493,
+    "precosMedios": {
+      "gasolina": 6.3,
+      "etanol": 4.65,
+      "diesel": 6.99
+    }
   },
   {
     "sigla": "RJ",
@@ -270,7 +370,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 1923,
-    "totalCidades": 92
+    "totalCidades": 92,
+    "precosMedios": {
+      "gasolina": 6.67,
+      "etanol": 4.81,
+      "diesel": 7.15
+    }
   },
   {
     "sigla": "RO",
@@ -283,7 +388,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 501,
-    "totalCidades": 51
+    "totalCidades": 51,
+    "precosMedios": {
+      "gasolina": 7.37,
+      "etanol": 5.19,
+      "diesel": 7.38
+    }
   },
   {
     "sigla": "RR",
@@ -296,7 +406,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 142,
-    "totalCidades": 15
+    "totalCidades": 15,
+    "precosMedios": {
+      "gasolina": 7.57,
+      "etanol": 5.38,
+      "diesel": 7.2
+    }
   },
   {
     "sigla": "SC",
@@ -309,7 +424,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 2037,
-    "totalCidades": 294
+    "totalCidades": 294,
+    "precosMedios": {
+      "gasolina": 6.43,
+      "etanol": 4.51,
+      "diesel": 7.07
+    }
   },
   {
     "sigla": "SE",
@@ -322,7 +442,12 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 318,
-    "totalCidades": 67
+    "totalCidades": 67,
+    "precosMedios": {
+      "gasolina": 7.01,
+      "etanol": 5.35,
+      "diesel": 7.08
+    }
   },
   {
     "sigla": "SP",
@@ -334,8 +459,13 @@
       "lng": -46.6333
     },
     "zoom": 12,
-    "totalPostosCadastrados": 8273,
-    "totalCidades": 641
+    "totalPostosCadastrados": 8285,
+    "totalCidades": 641,
+    "precosMedios": {
+      "gasolina": 6.38,
+      "etanol": 3.83,
+      "diesel": 7.17
+    }
   },
   {
     "sigla": "TO",
@@ -348,6 +478,11 @@
     },
     "zoom": 12,
     "totalPostosCadastrados": 391,
-    "totalCidades": 120
+    "totalCidades": 120,
+    "precosMedios": {
+      "gasolina": 6.94,
+      "etanol": 4.94,
+      "diesel": 7.22
+    }
   }
 ]

@@ -1,0 +1,40 @@
+name: Atualizar Preços Oficiais ANP
+
+on:
+  schedule:
+    # Executa toda segunda-feira às 06:00 UTC (03:00 Horário de Brasília)
+    - cron: '0 6 * * 1'
+  workflow_dispatch: # Permite execução manual a qualquer momento no painel do GitHub Actions
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar_dados:
+    name: Sincronizar Preços Oficiais ANP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Baixar Preços Semanais e Atualizar Dados
+        run: |
+          python3 scripts/gerar_postos_estados.py --forcar
+
+      - name: Commitar e Enviar Atualizações
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add static/data/
+          if git diff --staged --quiet; then
+            echo "Nenhuma alteração detectada nos dados da ANP. Nada a commitar."
+          else
+            git commit -m "chore(dados): atualização semanal de preços oficiais ANP"
+            git push origin main
+          fi
